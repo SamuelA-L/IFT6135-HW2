@@ -1,0 +1,5 @@
+*.idea/
+*.h5
+*venv/
+*virtualenv/
+__pycache__/
