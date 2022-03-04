@@ -5,23 +5,6 @@
 
 # ## Initialization
 
-# In[ ]:
-
-
-#@title Mount your Google Drive
-# If you run this notebook locally or on a cluster (i.e. not on Google Colab)
-# you can delete this cell which is specific to Google Colab. You may also
-# change the paths for data/logs in Arguments below.
-get_ipython().run_line_magic('matplotlib', 'inline')
-get_ipython().run_line_magic('load_ext', 'autoreload')
-get_ipython().run_line_magic('autoreload', '2')
-
-from google.colab import drive
-drive.mount('/content/gdrive')
-
-
-# In[ ]:
-
 
 #@title Link your assignment folder & install requirements
 #@markdown Enter the path to the assignment folder in your Google Drive
@@ -32,16 +15,6 @@ import sys
 import os
 import shutil
 import warnings
-
-folder = "" #@param {type:"string"}
-get_ipython().system('ln -Ts "$folder" /content/assignment 2> /dev/null')
-
-# Add the assignment folder to Python path
-if '/content/assignment' not in sys.path:
-  sys.path.insert(0, '/content/assignment')
-
-# Install requirements
-get_ipython().system('pip install -qr /content/assignment/requirements.txt')
 
 # Check if CUDA is available
 import torch
@@ -55,10 +28,9 @@ if not torch.cuda.is_available():
 # * (FR) `Modifier > Paramètres du notebook`
 # 
 
-# In[ ]:
 
 
-get_ipython().run_line_magic('matplotlib', 'inline')
+# get_ipython().run_line_magic('matplotlib', 'inline')
 import numpy as np
 import matplotlib.pyplot as plt
 import torch.optim as optim
@@ -72,7 +44,8 @@ from lstm_solution import LSTM
 from utils.wikitext2 import Wikitext2
 from utils.torch_utils import seed_experiment, to_device
 from utils.data_utils import save_logs
-from run_exp import train, evaluate
+from run_exp_lstm import train, evaluate
+# from run_exp_vit import train, evaluate
 
 
 # ## Experiments
@@ -85,12 +58,12 @@ from run_exp import train, evaluate
 @dataclass
 class Arguments:
   # Data
-  data_folder: str = '/content/assignment/data'
+  data_folder: str = './data'
   batch_size: int = 16
 
   # Model
   model: str = 'lstm'  # [lstm, gpt1]
-  embeddings: str = '/content/assignment/data/embeddings.npz'
+  embeddings: str = './data/embeddings.npz'
   layers: int = 1
 
   # Optimization
@@ -103,7 +76,7 @@ class Arguments:
   # Experiment
   exp_id: str = 'debug'
   log: bool = True
-  log_dir: str = '/content/assignment/logs'
+  log_dir: str = './logs'
   seed: int = 42
 
   # Miscellaneous
@@ -114,8 +87,6 @@ class Arguments:
 
 
 # The 6 configurations you need to run in Problem 1. Be careful that there is no discrepency between the configurations defined in `run_exp_lstm.py` and the ones below. In case there is a difference, the version from `run_exp_lstm.py` should be considered the ones to run.
-
-# In[ ]:
 
 
 # Note: if there is any discrepency with the configurations in run_exp_lstm.py, the
