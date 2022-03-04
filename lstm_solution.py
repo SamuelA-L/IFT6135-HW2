@@ -77,8 +77,7 @@ class LSTM(nn.Module):
         # ==========================
         embedded_inputs = self.embedding(inputs)
         lstm_outputs, final_hidden_states = self.lstm(embedded_inputs, hidden_states)
-        classifier_output = self.classifier(lstm_outputs)
-        log_probas = F.log_softmax(classifier_output, dim=-1)
+        log_probas = F.log_softmax(self.classifier(lstm_outputs), dim=-1)
 
         return log_probas, final_hidden_states
 
