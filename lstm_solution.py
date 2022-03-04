@@ -112,10 +112,17 @@ class LSTM(nn.Module):
         # TODO: Write your code here
         # ==========================
         #(2, 256, 40479)
-        # batch_size, sequence_length, vocabulary_size = log_probas.shape
-        # # masked_input = torch.masked_select(log_probas, mask)
-        # loss = F.nll_loss(log_probas.view(-1, vocabulary_size), targets.view(-1))
-        pass
+
+        batch_size, sequence_length, vocabulary_size = log_probas.shape
+        batch_loss = np.zeros(batch_size)
+        for i in range(batch_size):
+
+            batch_loss[i] = F.nll_loss(log_probas[i].view(-1, vocabulary_size), targets[i].view(-1), reduction='sum')
+
+        weights = torch.sum(mask, -1)
+        weighted_losses = batch_loss / weights
+
+        return torch.mean(weighted_losses)
 
     def initial_states(self, batch_size, device=None):
         if device is None:
