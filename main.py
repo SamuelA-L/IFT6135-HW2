@@ -44,8 +44,10 @@ from lstm_solution import LSTM
 from utils.wikitext2 import Wikitext2
 from utils.torch_utils import seed_experiment, to_device
 from utils.data_utils import save_logs
-from run_exp_lstm import train, evaluate
-# from run_exp_vit import train, evaluate
+# from run_exp_lstm import train, evaluate
+from run_exp_vit import train, evaluate
+
+from vit_solution import VisionTransformer
 
 
 # ## Experiments
@@ -54,6 +56,7 @@ from run_exp_lstm import train, evaluate
 
 # In[ ]:
 
+EMBEDDINGS_URL = 'https://drive.google.com/u/0/uc?id=1qmFoMV5Z1Dz2Kv8LE6CrfmMrzaIKXYbK&export=download'
 
 @dataclass
 class Arguments:
@@ -145,7 +148,7 @@ def main(args):
       args.embeddings, hidden_size=512, num_layers=args.layers
     )
   elif args.model == "gpt1":
-    model = MiniGPT1.load_embeddings_from(
+    model = VisionTransformer.load_embeddings_from(
       args.embeddings, num_layers=args.layers
     )
   else:

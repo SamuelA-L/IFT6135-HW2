@@ -39,7 +39,14 @@ class LayerNorm(nn.Module):
         # ==========================
         # TODO: Write your code here
         # ==========================
-        pass
+        x = inputs #.view(-1, self.hidden_size)
+        E_x = torch.mean(x, -1, keepdim=True)
+        Var_x = torch.var(x, -1, keepdim=True, unbiased=False)
+
+        layer_norm_x = (x - E_x) / torch.sqrt(Var_x + self.eps) * self.weight + self.bias
+
+        return layer_norm_x #.view(inputs.shape)
+
 
     def reset_parameters(self):
         nn.init.ones_(self.weight)
