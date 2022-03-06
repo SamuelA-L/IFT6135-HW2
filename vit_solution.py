@@ -169,7 +169,6 @@ class MultiHeadedAttention(nn.Module):
         # ==========================
         # TODO: Write your code here
         # ==========================
-        # print(tensor.shape)
         batch_size, sequence_length, headsXdims = tensor.shape
         splited = torch.reshape(tensor, [batch_size, sequence_length, self.num_heads, headsXdims//self.num_heads])
 
@@ -201,7 +200,10 @@ class MultiHeadedAttention(nn.Module):
         # ==========================
         # TODO: Write your code here
         # ==========================
-        pass
+        batch_size, num_heads, sequence_length, dim = tensor.shape
+        transposed = torch.transpose(tensor, 1, 2)
+
+        return torch.reshape(transposed, [batch_size, sequence_length, num_heads * dim ])
 
     def forward(self, hidden_states):
         """Multi-headed attention.
