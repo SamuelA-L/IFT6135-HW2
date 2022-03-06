@@ -102,7 +102,6 @@ class MultiHeadedAttention(nn.Module):
 
         return weights
 
-
     def apply_attention(self, queries, keys, values):
         """Apply the attention.
 
@@ -144,7 +143,10 @@ class MultiHeadedAttention(nn.Module):
         # ==========================
         # TODO: Write your code here
         # ==========================
-        pass
+        weights = self.get_attention_weights(queries, keys)
+        attended_values = torch.matmul(weights, values)
+
+        return self.merge_heads(attended_values)
 
     def split_heads(self, tensor):
         """Split the head vectors.
