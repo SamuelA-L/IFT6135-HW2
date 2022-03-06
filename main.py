@@ -44,8 +44,8 @@ from lstm_solution import LSTM
 from utils.wikitext2 import Wikitext2
 from utils.torch_utils import seed_experiment, to_device
 from utils.data_utils import save_logs
-# from run_exp_lstm import train, evaluate
-from run_exp_vit import train, evaluate
+from run_exp_lstm import train, evaluate
+# from run_exp_vit import train, evaluate
 
 from vit_solution import VisionTransformer
 

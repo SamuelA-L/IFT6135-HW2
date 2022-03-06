@@ -112,20 +112,20 @@ class LSTM(nn.Module):
         # TODO: Write your code here
         # ==========================
         #(2, 256, 40479)
-        with torch.no_grad():
 
-            batch_size, sequence_length, vocabulary_size = log_probas.shape
-            batch_losses = np.zeros((batch_size, sequence_length))
-            for i in range(batch_size):
 
-                batch_losses[i] = F.nll_loss(log_probas[i].view(-1, vocabulary_size), targets[i].view(-1), reduction='none') * mask[i]
+        batch_size, sequence_length, vocabulary_size = log_probas.shape
+        batch_losses = np.zeros((batch_size, sequence_length))
+        for i in range(batch_size):
 
-            batch_losses = torch.tensor(batch_losses)
-            batch_loss = torch.sum(batch_losses, -1)
-            weights = torch.sum(mask, -1)
-            weighted_losses = batch_loss / weights
+            batch_losses[i] = F.nll_loss(log_probas[i].detach().cpu().view(-1, vocabulary_size), targets[i].detach().cpu().view(-1), reduction='none') * mask[i]
 
-            return torch.mean(weighted_losses)
+        batch_losses = torch.tensor(batch_losses)
+        batch_loss = torch.sum(batch_losses, -1)
+        weights = torch.sum(mask, -1)
+        weighted_losses = batch_loss / weights
+
+        return torch.mean(weighted_losses)
 
     def initial_states(self, batch_size, device=None):
         if device is None:
