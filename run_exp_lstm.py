@@ -23,13 +23,13 @@ print("cuda device : ", torch.cuda.get_device_name(0))
 """
 # Configs to run
 
-1. python run_exp.py --model lstm --layers 1 --batch_size 16 --log --epochs 10 --optimizer adam
-2. python run_exp.py --model lstm --layers 1 --batch_size 16 --log --epochs 10 --optimizer adamw
-3. python run_exp.py --model lstm --layers 1 --batch_size 16 --log --epochs 10 --optimizer sgd
-4. python run_exp.py --model lstm --layers 1 --batch_size 16 --log --epochs 10 --optimizer momentum
+1. python run_exp.py --model lstm --layers 1 --batch_size 16 --log --epochs 10 --optimizer adam --exp_id 1 
+2. python run_exp.py --model lstm --layers 1 --batch_size 16 --log --epochs 10 --optimizer adamw  --exp_id 2  
+3. python run_exp.py --model lstm --layers 1 --batch_size 16 --log --epochs 10 --optimizer sgd --exp_id 3 
+4. python run_exp.py --model lstm --layers 1 --batch_size 16 --log --epochs 10 --optimizer momentum --exp_id 4
 
-5. python run_exp.py --model lstm --layers 2 --batch_size 16 --log --epochs 10 --optimizer adamw
-6. python run_exp.py --model lstm --layers 4 --batch_size 16 --log --epochs 10 --optimizer adamw
+5. python run_exp.py --model lstm --layers 2 --batch_size 16 --log --epochs 10 --optimizer adamw --exp_id 5 
+6. python run_exp.py --model lstm --layers 4 --batch_size 16 --log --epochs 10 --optimizer adamw --exp_id 6 
 
 """
 

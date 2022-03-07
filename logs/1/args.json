@@ -9,7 +9,7 @@
   "lr": 0.001,
   "momentum": 0.9,
   "weight_decay": 0.0005,
-  "exp_id": "debug",
+  "exp_id": "1",
   "log": true,
   "log_dir": "logs",
   "seed": 42,
