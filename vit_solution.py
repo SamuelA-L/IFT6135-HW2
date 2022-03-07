@@ -356,17 +356,22 @@ class PreNormAttentionBlock(nn.Module):
         # ==========================
         # TODO: Write your code here
         # ==========================
+
+        # postnorm
+
         # attention_outputs = self.attn(x)
         # attention_outputs = self.layer_norm_1(x + attention_outputs)
         # outputs = self.linear(attention_outputs)
         #
         # outputs = self.layer_norm_2(outputs + attention_outputs)
 
-        attention_outputs = self.attn(x)
-        added = self.layer_norm_1(x + attention_outputs)
-        normed = self.layer_norm_1(added)
-        ffn = self.linear(normed)
-        output = self.layer_norm_2(normed + ffn)
+        # prenorm
+        norm1 = self.layer_norm_1(x)
+        attention = self.attn(norm1)
+        out1 = x + attention
+        norm2 = self.layer_norm_2(out1)
+        ffn_out = self.linear(norm2)
+        output = out1 + ffn_out
 
         return output
 
@@ -458,7 +463,7 @@ class VisionTransformer(nn.Module):
         # Add CLS token and positional encoding
         cls_token = self.cls_token.repeat(B, 1, 1)
         x = torch.cat([cls_token, x], dim=1)
-        x = x + self.pos_embedding[:,:T+1]
+        x = x + self.pos_embedding[:, :T+1]
         
         #Add dropout and then the transformer
         
