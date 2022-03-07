@@ -1,5 +1,6 @@
 import numpy as np
 import torch
+import torch.nn
 import torch.nn as nn
 import torch.nn.functional as F
 import math
@@ -66,17 +67,22 @@ class MultiHeadedAttention(nn.Module):
         w_dim = num_heads * head_size
         w_shape = (w_dim, w_dim)
 
-        self.W_Q = torch.tensor(np.zeros(w_shape), dtype=torch.float, requires_grad=True)
-        self.b_Q = torch.tensor(np.zeros(w_dim), dtype=torch.float, requires_grad=True)
-
-        self.W_K = torch.tensor(np.zeros(w_shape), dtype=torch.float, requires_grad=True)
-        self.b_K = torch.tensor(np.zeros(w_dim), dtype=torch.float, requires_grad=True)
-
-        self.W_V = torch.tensor(np.zeros(w_shape), dtype=torch.float, requires_grad=True)
-        self.b_V = torch.tensor(np.zeros(w_dim), dtype=torch.float, requires_grad=True)
+        # self.W_Q = torch.tensor(np.zeros(w_shape), dtype=torch.float, requires_grad=True)
+        # self.b_Q = torch.tensor(np.zeros(w_dim), dtype=torch.float, requires_grad=True)
+        #
+        # self.W_K = torch.tensor(np.zeros(w_shape), dtype=torch.float, requires_grad=True)
+        # self.b_K = torch.tensor(np.zeros(w_dim), dtype=torch.float, requires_grad=True)
+        #
+        # self.W_V = torch.tensor(np.zeros(w_shape), dtype=torch.float, requires_grad=True)
+        # self.b_V = torch.tensor(np.zeros(w_dim), dtype=torch.float, requires_grad=True)
 
         self.W_Y = torch.tensor(np.zeros(w_shape), dtype=torch.float, requires_grad=True)
         self.b_Y = torch.tensor(np.zeros(w_dim), dtype=torch.float, requires_grad=True)
+
+        self.Q_lin = torch.nn.Linear(w_dim, w_dim, bias=True)
+        self.K_lin = torch.nn.Linear(w_dim, w_dim, bias=True)
+        self.V_lin = torch.nn.Linear(w_dim, w_dim, bias=True)
+        self.Y_lin = torch.nn.Linear(w_dim, w_dim, bias=True)
 
     def get_attention_weights(self, queries, keys):
         """Compute the attention weights.
@@ -266,12 +272,17 @@ class MultiHeadedAttention(nn.Module):
         #
         # Y = attention(Q, K, V)  # Attended values (concatenated for all heads)
         # outputs = Y * W_{Y} + b_{Y}  # Linear projection
-        Q = self.split_heads(torch.matmul(hidden_states, self.W_Q) + self.b_Q)
-        K = self.split_heads(torch.matmul(hidden_states, self.W_K) + self.b_K)
-        V = self.split_heads(torch.matmul(hidden_states, self.W_V) + self.b_V)
+
+        # Q = self.split_heads(torch.matmul(hidden_states, self.W_Q) + self.b_Q)
+        # K = self.split_heads(torch.matmul(hidden_states, self.W_K) + self.b_K)
+        # V = self.split_heads(torch.matmul(hidden_states, self.W_V) + self.b_V)
+        Q = self.split_heads(self.Q_lin(hidden_states))
+        K = self.split_heads(self.K_lin(hidden_states))
+        V = self.split_heads(self.V_lin(hidden_states))
+
         Y = self.apply_attention(Q, V, K)
 
-        return torch.matmul(Y, self.W_Y) + self.b_Y
+        return self.Y_lin(Y)
 
 
 class PostNormAttentionBlock(nn.Module):
