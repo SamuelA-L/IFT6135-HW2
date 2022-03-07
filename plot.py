@@ -8,7 +8,7 @@ def read_file_values(file_name):
     return [float(line) for line in lines]
 
 
-def plot(title, arrays, y_label):
+def plot(title, arrays, y_label, save=False):
 
     for i in range(len(arrays)):
         plt.plot(arrays[i], label='experiment ' + str(i+1))
@@ -17,7 +17,13 @@ def plot(title, arrays, y_label):
     plt.xlabel('epochs')
     plt.ylabel(y_label)
     plt.xticks(np.arange(0, len(arrays[i]), 1))
+
+    if save:
+        plt.savefig('/home/samuel/Desktop/figures_HW2/' + title + '.png')
+
     plt.show()
+
+
 
 
 train_losses_lstm = []
@@ -38,4 +44,7 @@ for i in range(6):
     valid_ppl_lstm.append(read_file_values('logs/' + str(i+1) + '/valid_ppl.txt'))
 
 
-plot("LSTM train loss by experiment", train_losses_lstm, 'loss')
+plot("LSTM train loss by experiment", train_losses_lstm, 'loss', save=False)
+plot("LSTM validation loss by experiment", valid_losses_lstm, 'loss', save=False)
+plot("LSTM train ppl by experiment", train_ppl_lstm, 'loss', save=False)
+plot("LSTM valid ppl by experiment", valid_losses_lstm, 'loss', save=False)
