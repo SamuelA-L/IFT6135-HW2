@@ -482,7 +482,6 @@ class VisionTransformer(nn.Module):
 
         return self.mlp_head(x)
         
-    
 
     def loss(self,preds,labels):
         '''Loss function.
@@ -496,4 +495,4 @@ class VisionTransformer(nn.Module):
         # ==========================
         # TODO: Write your code here
         # ==========================
-        pass
+        return F.cross_entropy(preds, labels)
