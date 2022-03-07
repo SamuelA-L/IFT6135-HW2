@@ -314,7 +314,7 @@ class PostNormAttentionBlock(nn.Module):
     def forward(self, x):
        
         attention_outputs = self.attn(x)
-        #print(inp_x.shape)
+        # print(inp_x.shape)
         attention_outputs = self.layer_norm_1(x + attention_outputs)
         outputs=self.linear(attention_outputs)
 
@@ -356,8 +356,19 @@ class PreNormAttentionBlock(nn.Module):
         # ==========================
         # TODO: Write your code here
         # ==========================
-        pass
+        # attention_outputs = self.attn(x)
+        # attention_outputs = self.layer_norm_1(x + attention_outputs)
+        # outputs = self.linear(attention_outputs)
+        #
+        # outputs = self.layer_norm_2(outputs + attention_outputs)
 
+        attention_outputs = self.attn(x)
+        added = self.layer_norm_1(x + attention_outputs)
+        normed = self.layer_norm_1(added)
+        ffn = self.linear(normed)
+        output = self.layer_norm_2(normed + ffn)
+
+        return output
 
 
 class VisionTransformer(nn.Module):
@@ -401,7 +412,7 @@ class VisionTransformer(nn.Module):
         self.cls_token = nn.Parameter(torch.randn(1,1,embed_dim))
         self.pos_embedding = nn.Parameter(torch.randn(1,self.sequence_length,embed_dim))
     
-    def get_patches(self,image, patch_size, flatten_channels=True):
+    def get_patches(self, image, patch_size, flatten_channels=True):
         """
         Inputs:
             image - torch.Tensor representing the image of shape [B, C, H, W]
@@ -413,7 +424,16 @@ class VisionTransformer(nn.Module):
         # ==========================
         # TODO: Write your code here
         # ==========================
-        pass
+        B, C, H, W = image.shape
+        breakpoint()
+        patches = F.unfold(image, kernel_size=(patch_size, patch_size), stride=patch_size)
+
+        n_patches = patches.shape[1]
+
+        if flatten_channels:
+            return patches
+        else:
+            return patches.reshape([B, n_patches, patch_size, patch_size ])
 
 
     def forward(self, x):

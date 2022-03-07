@@ -152,7 +152,8 @@ def main(args):
     # Model
     if args.model == "vit":
         model = VisionTransformer(
-            num_layers=args.num_layers, block=args.block)
+            num_layers=1, block=args.block)
+            # num_layers=args.num_layers, block=args.block)
     else:
         raise ValueError("Unknown model {0}".format(args.model))
     model.to(args.device)
