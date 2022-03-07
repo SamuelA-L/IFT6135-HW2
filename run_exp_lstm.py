@@ -16,6 +16,9 @@ from utils.torch_utils import seed_experiment, to_device
 from utils.data_utils import save_logs
 
 
+print("cuda available : ", torch.cuda.is_available())
+print("cuda device : ", torch.cuda.get_device_name(0))
+
 
 """
 # Configs to run

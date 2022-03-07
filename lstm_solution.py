@@ -115,12 +115,11 @@ class LSTM(nn.Module):
 
 
         batch_size, sequence_length, vocabulary_size = log_probas.shape
-        batch_losses = np.zeros((batch_size, sequence_length))
+        batch_losses = torch.tensor(np.zeros((batch_size, sequence_length)), requires_grad=True).to('cuda')
         for i in range(batch_size):
 
-            batch_losses[i] = F.nll_loss(log_probas[i].detach().cpu().view(-1, vocabulary_size), targets[i].detach().cpu().view(-1), reduction='none') * mask[i]
+            batch_losses[i] = F.nll_loss(log_probas[i].view(-1, vocabulary_size), targets[i].view(-1), reduction='none') * mask[i].to('cuda')
 
-        batch_losses = torch.tensor(batch_losses)
         batch_loss = torch.sum(batch_losses, -1)
         weights = torch.sum(mask, -1)
         weighted_losses = batch_loss / weights
