@@ -470,18 +470,20 @@ class VisionTransformer(nn.Module):
         # ==========================
         # TODO: Write your code here
         # ==========================
-        
+        x = self.dropout(x)
+        x = self.transformer(x)
 
         #Take the cls token representation and send it to mlp_head
 
         # ==========================
         # TODO: Write your code here
         # ==========================
-        
+        x = x[:, 0]  #x.mean(dim=1)
+
+        return self.mlp_head(x)
         
     
-        
-        pass
+
     def loss(self,preds,labels):
         '''Loss function.
 
