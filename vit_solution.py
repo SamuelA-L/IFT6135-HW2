@@ -425,9 +425,8 @@ class VisionTransformer(nn.Module):
         # TODO: Write your code here
         # ==========================
         B, C, H, W = image.shape
-        breakpoint()
         patches = F.unfold(image, kernel_size=(patch_size, patch_size), stride=patch_size)
-
+        patches = torch.transpose(patches, 1, 2)
         n_patches = patches.shape[1]
 
         if flatten_channels:
