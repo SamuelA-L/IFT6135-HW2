@@ -1,5 +1,6 @@
 import numpy as np
 import torch
+import torch.nn
 import torch.nn as nn
 import torch.nn.functional as F
 import math
@@ -66,17 +67,22 @@ class MultiHeadedAttention(nn.Module):
         w_dim = num_heads * head_size
         w_shape = (w_dim, w_dim)
 
-        self.W_Q = torch.tensor(np.zeros(w_shape), dtype=torch.float, requires_grad=True)
-        self.b_Q = torch.tensor(np.zeros(w_dim), dtype=torch.float, requires_grad=True)
-
-        self.W_K = torch.tensor(np.zeros(w_shape), dtype=torch.float, requires_grad=True)
-        self.b_K = torch.tensor(np.zeros(w_dim), dtype=torch.float, requires_grad=True)
-
-        self.W_V = torch.tensor(np.zeros(w_shape), dtype=torch.float, requires_grad=True)
-        self.b_V = torch.tensor(np.zeros(w_dim), dtype=torch.float, requires_grad=True)
+        # self.W_Q = torch.tensor(np.zeros(w_shape), dtype=torch.float, requires_grad=True)
+        # self.b_Q = torch.tensor(np.zeros(w_dim), dtype=torch.float, requires_grad=True)
+        #
+        # self.W_K = torch.tensor(np.zeros(w_shape), dtype=torch.float, requires_grad=True)
+        # self.b_K = torch.tensor(np.zeros(w_dim), dtype=torch.float, requires_grad=True)
+        #
+        # self.W_V = torch.tensor(np.zeros(w_shape), dtype=torch.float, requires_grad=True)
+        # self.b_V = torch.tensor(np.zeros(w_dim), dtype=torch.float, requires_grad=True)
 
         self.W_Y = torch.tensor(np.zeros(w_shape), dtype=torch.float, requires_grad=True)
         self.b_Y = torch.tensor(np.zeros(w_dim), dtype=torch.float, requires_grad=True)
+
+        self.Q_lin = torch.nn.Linear(w_dim, w_dim, bias=True)
+        self.K_lin = torch.nn.Linear(w_dim, w_dim, bias=True)
+        self.V_lin = torch.nn.Linear(w_dim, w_dim, bias=True)
+        self.Y_lin = torch.nn.Linear(w_dim, w_dim, bias=True)
 
     def get_attention_weights(self, queries, keys):
         """Compute the attention weights.
@@ -266,12 +272,17 @@ class MultiHeadedAttention(nn.Module):
         #
         # Y = attention(Q, K, V)  # Attended values (concatenated for all heads)
         # outputs = Y * W_{Y} + b_{Y}  # Linear projection
-        Q = self.split_heads(torch.matmul(hidden_states, self.W_Q) + self.b_Q)
-        K = self.split_heads(torch.matmul(hidden_states, self.W_K) + self.b_K)
-        V = self.split_heads(torch.matmul(hidden_states, self.W_V) + self.b_V)
+
+        # Q = self.split_heads(torch.matmul(hidden_states, self.W_Q) + self.b_Q)
+        # K = self.split_heads(torch.matmul(hidden_states, self.W_K) + self.b_K)
+        # V = self.split_heads(torch.matmul(hidden_states, self.W_V) + self.b_V)
+        Q = self.split_heads(self.Q_lin(hidden_states))
+        K = self.split_heads(self.K_lin(hidden_states))
+        V = self.split_heads(self.V_lin(hidden_states))
+
         Y = self.apply_attention(Q, V, K)
 
-        return torch.matmul(Y, self.W_Y) + self.b_Y
+        return self.Y_lin(Y)
 
 
 class PostNormAttentionBlock(nn.Module):
@@ -303,7 +314,7 @@ class PostNormAttentionBlock(nn.Module):
     def forward(self, x):
        
         attention_outputs = self.attn(x)
-        #print(inp_x.shape)
+        # print(inp_x.shape)
         attention_outputs = self.layer_norm_1(x + attention_outputs)
         outputs=self.linear(attention_outputs)
 
@@ -345,8 +356,24 @@ class PreNormAttentionBlock(nn.Module):
         # ==========================
         # TODO: Write your code here
         # ==========================
-        pass
 
+        # postnorm
+
+        # attention_outputs = self.attn(x)
+        # attention_outputs = self.layer_norm_1(x + attention_outputs)
+        # outputs = self.linear(attention_outputs)
+        #
+        # outputs = self.layer_norm_2(outputs + attention_outputs)
+
+        # prenorm
+        norm1 = self.layer_norm_1(x)
+        attention = self.attn(norm1)
+        out1 = x + attention
+        norm2 = self.layer_norm_2(out1)
+        ffn_out = self.linear(norm2)
+        output = out1 + ffn_out
+
+        return output
 
 
 class VisionTransformer(nn.Module):
@@ -390,7 +417,7 @@ class VisionTransformer(nn.Module):
         self.cls_token = nn.Parameter(torch.randn(1,1,embed_dim))
         self.pos_embedding = nn.Parameter(torch.randn(1,self.sequence_length,embed_dim))
     
-    def get_patches(self,image, patch_size, flatten_channels=True):
+    def get_patches(self, image, patch_size, flatten_channels=True):
         """
         Inputs:
             image - torch.Tensor representing the image of shape [B, C, H, W]
@@ -402,7 +429,15 @@ class VisionTransformer(nn.Module):
         # ==========================
         # TODO: Write your code here
         # ==========================
-        pass
+        B, C, H, W = image.shape
+        patches = F.unfold(image, kernel_size=(patch_size, patch_size), stride=patch_size)
+        patches = torch.transpose(patches, 1, 2)
+        n_patches = patches.shape[1]
+
+        if flatten_channels:
+            return patches
+        else:
+            return patches.reshape([B, n_patches, patch_size, patch_size ])
 
 
     def forward(self, x):
@@ -428,25 +463,26 @@ class VisionTransformer(nn.Module):
         # Add CLS token and positional encoding
         cls_token = self.cls_token.repeat(B, 1, 1)
         x = torch.cat([cls_token, x], dim=1)
-        x = x + self.pos_embedding[:,:T+1]
+        x = x + self.pos_embedding[:, :T+1]
         
         #Add dropout and then the transformer
         
         # ==========================
         # TODO: Write your code here
         # ==========================
-        
+        x = self.dropout(x)
+        x = self.transformer(x)
 
         #Take the cls token representation and send it to mlp_head
 
         # ==========================
         # TODO: Write your code here
         # ==========================
+        x = x[:, 0]  #x.mean(dim=1)
+
+        return self.mlp_head(x)
         
-        
-    
-        
-        pass
+
     def loss(self,preds,labels):
         '''Loss function.
 
@@ -459,4 +495,4 @@ class VisionTransformer(nn.Module):
         # ==========================
         # TODO: Write your code here
         # ==========================
-        pass
+        return F.cross_entropy(preds, labels)
