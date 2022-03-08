@@ -23,7 +23,19 @@ def plot(title, arrays, y_label, save=False):
 
     plt.show()
 
+def plot_dual(title, arrays, series, y_label, save=False):
 
+    for i in range(len(arrays)):
+        plt.plot(np.cumsum(np.array(series[i])), arrays[i], label='experiment ' + str(i+1))
+    plt.legend()
+    plt.title(title)
+    plt.xlabel('Time (s)')
+    plt.ylabel(y_label)
+
+    if save:
+        plt.savefig('/home/samuel/Desktop/figures_HW2/' + title + '.png')
+
+    plt.show()
 
 
 train_losses_lstm = []
@@ -31,20 +43,37 @@ train_ppl_lstm = []
 valid_losses_lstm = []
 valid_ppl_lstm = []
 
-train_losses_vit = []
-train_ppl_vit = []
-valid_losses_vit = []
-valid_ppl_vit = []
 
-
-for i in range(6):
-    train_losses_lstm.append(read_file_values('logs/' + str(i+1) + '/train_loss.txt'))
-    train_ppl_lstm.append(read_file_values('logs/' + str(i+1) + '/train_ppl.txt'))
-    valid_losses_lstm.append(read_file_values('logs/' + str(i+1) + '/valid_loss.txt'))
-    valid_ppl_lstm.append(read_file_values('logs/' + str(i+1) + '/valid_ppl.txt'))
+for i in range(1, 7):
+    train_losses_lstm.append(read_file_values('logs/' + str(i) + '/train_loss.txt'))
+    train_ppl_lstm.append(read_file_values('logs/' + str(i) + '/train_ppl.txt'))
+    valid_losses_lstm.append(read_file_values('logs/' + str(i) + '/valid_loss.txt'))
+    valid_ppl_lstm.append(read_file_values('logs/' + str(i) + '/valid_ppl.txt'))
 
 
 plot("LSTM train loss by experiment", train_losses_lstm, 'loss', save=False)
 plot("LSTM validation loss by experiment", valid_losses_lstm, 'loss', save=False)
 plot("LSTM train ppl by experiment", train_ppl_lstm, 'loss', save=False)
 plot("LSTM valid ppl by experiment", valid_losses_lstm, 'loss', save=False)
+
+
+train_losses_vit = []
+train_accs_vit = []
+train_time_vit = []
+valid_losses_vit = []
+valid_accs_vit = []
+valid_time_vit = []
+
+for i in range(7, 14):
+    train_losses_vit.append(read_file_values('logs/' + str(i) + '/train_loss.txt'))
+    train_accs_vit.append(read_file_values('logs/' + str(i) + '/train_accs.txt'))
+    train_time_vit.append(read_file_values('logs/' + str(i) + '/train_time.txt'))
+    valid_losses_vit.append(read_file_values('logs/' + str(i) + '/valid_loss.txt'))
+    valid_accs_vit.append(read_file_values('logs/' + str(i) + '/valid_accs.txt'))
+    valid_time_vit.append(read_file_values('logs/' + str(i) + '/valid_time.txt'))
+
+
+plot("Vision Transformer train accuracy over epoch by experiment", train_accs_vit, 'Accuracy', save=True)
+plot_dual("Vision Transformer train accuracy over wall-clock time by experiment", train_accs_vit, train_time_vit, 'Accuracy', save=True)
+plot("Vision Transformer valid accuracy over epoch by experiment", valid_accs_vit, 'Accuracy', save=True)
+plot_dual("Vision Transformer valid accuracy over wall-clock by experiment", valid_accs_vit, valid_time_vit, 'Accuracy', save=True)

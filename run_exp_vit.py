@@ -10,6 +10,7 @@ import torch.optim as optim
 
 from torch.utils.data import DataLoader
 from tqdm import tqdm
+from utils.data_utils import save_logs
 
 ## Torchvision
 import torchvision
@@ -19,7 +20,7 @@ from torchvision import transforms
 from vit_solution import VisionTransformer
 
 from utils.torch_utils import seed_experiment, to_device
-#from utils.data_utils import save_logs
+from utils.data_utils import save_logs_vit
 
 """
 # Configs to run
@@ -351,4 +352,8 @@ if __name__ == "__main__":
         )
 
     logs = main(args)
+
+    # Log experiment data
+    if args.log is not None:
+        save_logs_vit(args, *logs)
     #Reuse the save logs function in utils to your needs if needed.
