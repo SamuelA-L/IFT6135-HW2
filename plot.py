@@ -40,6 +40,7 @@ def plot_dual(title, arrays, series, y_label, save=False):
 
 train_losses_lstm = []
 train_ppl_lstm = []
+train_time_lstm = []
 valid_losses_lstm = []
 valid_ppl_lstm = []
 
