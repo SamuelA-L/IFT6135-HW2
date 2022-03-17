@@ -496,3 +496,7 @@ class VisionTransformer(nn.Module):
         # TODO: Write your code here
         # ==========================
         return F.cross_entropy(preds, labels)
+
+
+multihead = MultiHeadedAttention(5, 15, 400)
+print()
