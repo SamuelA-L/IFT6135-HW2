@@ -58,8 +58,8 @@ def bar_plot(title, array, x_label, y_label, save=False, plot=True):
 SAVE_FIGURES_LSTM = False
 PLOT_FIGURES_LSTM = False
 
-SAVE_FIGURES_ViT = False
-PLOT_FIGURES_ViT = False
+SAVE_FIGURES_ViT = True
+PLOT_FIGURES_ViT = True
 
 train_losses_lstm = []
 train_ppl_lstm = []
